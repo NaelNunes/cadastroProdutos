@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <conio2.h>
 
 struct tpProd 
@@ -83,10 +84,84 @@ void exibirProd(void){
 
 void exibirProdE(void)
 {
+	int pos;
+	tpProd R;
+	FILE *PtrProd = fopen("produtos.dat", "rb");
 	
+	printf("Digite o codigo do produto que deseja buscar: ");
+	scanf("%d", &R.codProd);
+	
+	while(R.codProd != 0)
+	{
+		if(PtrProd == NULL)
+			printf("Erro de Abertura\n");
+		else
+		{
+			pos = buscaCod(PtrProd , R.codProd);
+			if(pos == -1)
+				printf("Não foi encontrado produto ou nao ha registros!");
+			else
+			{
+				fseek(PtrProd,pos,0);
+				fread(&R, sizeof(tpProd), 1, PtrProd);
+				printf("\nEncontrado!\n\n");
+				printf("Codigo do produto: %d\n", R.codProd);
+				printf("Nome do produto: %s\n", R.nomeProd);
+				printf("Quantidade no estoque: %d\n", R.quantProd);
+				printf("Preco do produto: %.2f", R.precoProd);
+			}
+			printf("\n\nDigite o codigo do produto que deseja buscar: ");
+			scanf("%d", &R.codProd);
+		}		
+	}
+	
+	fclose(PtrProd);
+}
+
+void deletarRegistros(void)
+{
+	FILE *PtrProd = fopen("produtos.dat", "wb");
+	fclose(PtrProd);
+}
+
+void Menu(void){
+	char op;
+	do
+	{
+		system("cls");
+		printf("\n### GERENCIAMENTO DE PRODUTOS ###\n");
+		printf("[A] Cadastrar Produtos\n");
+		printf("[B] Exibir Produtos\n");
+		printf("[C] Exibir Produtos Especificos\n");
+		printf("[D] Deletar Registros\n");
+		printf("[ESC] Finalizar\n");
+		op = toupper(getch());
+		switch(op)
+		{
+			case 'A': 
+					cadProduto();
+					break;
+			
+			case 'B': 
+					exibirProd();
+					break;
+			
+			case 'C': 
+					exibirProdE();  
+					break;
+		
+			case 'D':
+					deletarRegistros();
+					break;					
+		}
+		
+	}while (op!=27);
 }
 
 int main(void){
-    cadProduto();
-    exibirProd();
+    Menu();
+    return 0;
 }
+
+
+
