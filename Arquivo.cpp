@@ -73,7 +73,7 @@ void exibirProd(void){
             printf("\nCod. do produto: %d", R.codProd);
             printf("\nNome do produto: %s", R.nomeProd);
             printf("\nQtd. do produto: %d", R.quantProd);
-            printf("\nPreco do produto: %.2f", R.precoProd);
+            printf("\nPreco do produto: %.2f\n", R.precoProd);
             fread(&R, sizeof(tpProd), 1, PtrProd);
         }
 
@@ -108,7 +108,7 @@ void exibirProdE(void)
 				printf("Codigo do produto: %d\n", R.codProd);
 				printf("Nome do produto: %s\n", R.nomeProd);
 				printf("Quantidade no estoque: %d\n", R.quantProd);
-				printf("Preco do produto: %.2f", R.precoProd);
+				printf("Preco do produto: %.2f\n\n", R.precoProd);
 			}
 			printf("\n\nDigite o codigo do produto que deseja buscar: ");
 			scanf("%d", &R.codProd);
@@ -116,6 +116,48 @@ void exibirProdE(void)
 	}
 	
 	fclose(PtrProd);
+}
+
+void updateRegistro(void)
+{
+	int pos;
+	FILE *PtrProd = fopen("produtos.dat", "rb+");
+	tpProd R;
+	
+	printf("Atualizar produto: \n");
+	printf("Digite o codigo do produto para atualizar: \n");
+	scanf("%d", &R.codProd);
+	
+	while(R.codProd != 0)
+	{
+		if(PtrProd == NULL)
+			printf("Erro de Abertura\n");
+		else
+		{
+			pos = buscaCod(PtrProd,R.codProd);
+			if(pos == -1)
+			{
+				printf("Nao foi encontrado produto ou nao ha registros!\n");
+			} 
+			else
+			{
+				fseek(PtrProd, pos, 0);
+				fread(&R, sizeof(tpProd), 1, PtrProd);
+				printf("Digite o novo nome do produto [%s]: \n", R.nomeProd);
+				fflush(stdin);
+				gets(R.nomeProd);
+				printf("Digite a nova quantidade [%d]: \n", R.quantProd);
+				scanf("%d", &R.quantProd);
+				printf("Digite o novo preco [%.2f]: \n", R.precoProd);
+				scanf("%f", &R.precoProd);
+				fseek(PtrProd, pos, 0);
+				fwrite(&R, sizeof(tpProd), 1, PtrProd);					
+			}
+			printf("Digite o codigo do produto para atualizar: \n");
+			scanf("%d", &R.codProd);		
+		}
+	}
+	fclose(PtrProd);	
 }
 
 void deletarRegistros(void)
@@ -134,6 +176,7 @@ void Menu(void){
 		printf("[B] Exibir Produtos\n");
 		printf("[C] Exibir Produtos Especificos\n");
 		printf("[D] Deletar Registros\n");
+		printf("[E] Atualizar Registro\n");
 		printf("[ESC] Finalizar\n");
 		op = toupper(getch());
 		switch(op)
@@ -152,6 +195,10 @@ void Menu(void){
 		
 			case 'D':
 					deletarRegistros();
+					break;
+			
+			case 'E':
+					updateRegistro();
 					break;					
 		}
 		
